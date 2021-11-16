@@ -8,7 +8,6 @@
 #include "raccordeur_simple.h"
 
 
-// sudo apt-get install libfftw3-dev libtiff5-dev
 
 int main(int argc, char **argv){
 

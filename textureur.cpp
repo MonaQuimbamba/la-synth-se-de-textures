@@ -351,7 +351,8 @@ void Textureur::ajuster_coupe_HB(int c, int l, int* coupe){
   }
 }
 
-int Textureur::randomBlockIndex() {
+int Textureur::randomBlockIndex()
+{
     if (utiliserPermuteur) {
         return permuteur->suivant();
     } else {
@@ -413,35 +414,43 @@ int Textureur::bestBlockIndex(Raccordeur* raccordeur, int vg, int vh) {
     return res;
 }
 
-void Textureur::doAlgo(Raccordeur* raccordeur) {
+void Textureur::doAlgo(Raccordeur* raccordeur)
+{
     // premier bloc choisi au hasard
     int c, l;
-    for (l = 0;l < res_verti; l++) { // indice ligne - progression par bloc
-        for (c = 0; c < res_hori; c++) { // indice colonne
-            int ind;
-            if (choisirMeilleurBloc) {
-                int vg = c>0 ? res_bindex->get(c-1, l) : -1;
-                int vh = l>0 ? res_bindex->get(c, l-1) : -1;
-                ind = bestBlockIndex(raccordeur, vg, vh);
-            } else {
-                ind = randomBlockIndex();
-            }
-            // fprintf(stderr, "xr=%d,yr=%d,bloc= %d\n", c, l, ind);
-            res_bindex->set(c, l, ind);
-            placer_avec_bord(ind, c, l);
-            if (c > 0) {
-                int *coupe = new int[bloc_h];
-                Coupe_GD(raccordeur, &table_blocs[ind], &table_blocs[res_bindex->get(c-1, l)], coupe);
-                ajuster_coupe_GD(c, l, coupe);
-                delete[] coupe;
-            }
-            if (l > 0) {
-                int *coupe = new int[bloc_w];
-                Coupe_HB(raccordeur, &table_blocs[ind], &table_blocs[res_bindex->get(c, l-1)], coupe);
-                ajuster_coupe_HB(c, l, coupe);
-                delete[] coupe;
-            }
-        }
+    for (l = 0;l < res_verti; l++)
+    { // indice ligne - progression par bloc
+          for (c = 0; c < res_hori; c++)
+          { // indice colonne
+                  int ind;
+                  if (choisirMeilleurBloc)
+                  {
+                      int vg = c>0 ? res_bindex->get(c-1, l) : -1;
+                      int vh = l>0 ? res_bindex->get(c, l-1) : -1;
+                      ind = bestBlockIndex(raccordeur, vg, vh);
+                  }
+                  else
+                  {
+                      ind = randomBlockIndex();
+                  }
+                  // fprintf(stderr, "xr=%d,yr=%d,bloc= %d\n", c, l, ind);
+                  res_bindex->set(c, l, ind);
+                  placer_avec_bord(ind, c, l);
+                  if (c > 0)
+                  {
+                      int *coupe = new int[bloc_h];
+                      Coupe_GD(raccordeur, &table_blocs[ind], &table_blocs[res_bindex->get(c-1, l)], coupe);
+                      ajuster_coupe_GD(c, l, coupe);
+                      delete[] coupe;
+                  }
+                  if (l > 0)
+                  {
+                      int *coupe = new int[bloc_w];
+                      Coupe_HB(raccordeur, &table_blocs[ind], &table_blocs[res_bindex->get(c, l-1)], coupe);
+                      ajuster_coupe_HB(c, l, coupe);
+                      delete[] coupe;
+                  }
+          }
     }
     screen->DisplayImage(im_res->GetLinePtr(0), res_w, res_h);
     printf("c'est tout - cliquer dans l'image resultat pour finir\n");

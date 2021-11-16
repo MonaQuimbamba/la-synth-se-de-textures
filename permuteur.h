@@ -43,11 +43,10 @@ public:
  private :
   int max;
   int* perm; // tableau de la permutation.
-  int * indices; // tableau des indices à permuter
+  int* indices; // tableau des indices ï¿½ permuter
   int i_perm;  // indice d'avancement dans la permutation.
 
 };
 
 
 #endif	/* _PERMUTEUR_H */
-

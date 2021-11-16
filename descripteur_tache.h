@@ -1,4 +1,4 @@
-#ifndef _DESCRIPTEUR_TACHE_H	
+#ifndef _DESCRIPTEUR_TACHE_H
 #define	_DESCRIPTEUR_TACHE_H
 
 #include "raccordeur.h"
@@ -6,7 +6,7 @@
 /*!
  * Decrit une tache qui sera donnee a executer a une instance de la classe
  * Textureur a l'aide de la methode traiterTache(...).
- * 
+ *
  * Cette classe est plutot une "struct", elle ne contient aucune methodes et
  * tous ses attributs sont "public" et donc accessible par tout le monde.
  */
@@ -16,6 +16,7 @@ public:
    * Fichier image d'entree du textureur.
    */
   const char* fichierImage;
+
 
   /*!
    * Faut-il utiliser un permuteur (classe Permuteur) ou choisir un nouveau bloc
@@ -30,7 +31,7 @@ public:
   bool choisirMeilleurBloc;
 
   /*!
-   * Racine carre du nombre de blocs 
+   * Racine carre du nombre de blocs
    */
   int racineNombreBlocs;
 
@@ -56,7 +57,7 @@ public:
    * recoller (\see{Raccordeur#calculerRaccord}).
    */
   Raccordeur* raccordeur;
-  
+
   /*!
    * Constructeur.
    * Comme il est la seule methode de la classe et est tres simple, on se permet
@@ -69,4 +70,3 @@ public:
 };
 
 #endif	/* _DESCRIPTEUR_TACHE_H */
-
