@@ -1,2 +1,13 @@
 tp.o
 testpermut.o
+matrix2d.o
+permuteur.o
+raccordeur_simple.o
+main_testpermut.o
+image_4b.o
+main_tp.o
+textureur.o
+x11display_code.o
+RaccordeurIteratif.o
+RaccordeurRecursif.o
+RaccordeurRecursifNaif.o
