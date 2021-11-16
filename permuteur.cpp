@@ -36,7 +36,7 @@ Permuteur::Permuteur(int max)
  */
 int Permuteur::suivantAlea()
 {
-  i_perm = rand() % max; 
+  i_perm = rand() % max -1 ; 
   return perm[i_perm];
 }
 
