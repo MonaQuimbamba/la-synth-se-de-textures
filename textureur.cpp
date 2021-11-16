@@ -1,6 +1,5 @@
 #include "textureur.h"
 
-
 // ======================
 //  Constructeur
 // ======================
@@ -57,7 +56,8 @@ void Textureur::traiterTache(DescripteurTache* tache)
 // Initialisation du textureur
 //=============================
 
-void Textureur::init(DescripteurTache& tache) {
+void Textureur::init(DescripteurTache& tache)
+{
 
     bloc_fac = tache.racineNombreBlocs;
     TRecouv = tache.recouvrement;
@@ -354,7 +354,7 @@ void Textureur::ajuster_coupe_HB(int c, int l, int* coupe){
 int Textureur::randomBlockIndex()
 {
     if (utiliserPermuteur) {
-        return permuteur->suivant();
+        return permuteur->suivantAlea();
     } else {
         return random() % nb_bloc;
         // ceci n'est pas la meilleur facon de faire un random (voir tools.h)

@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <cstdlib>
-
+#include <stdlib.h> 
 
 /*!
  * Construit un nouveau permuteur qui retournera des nombres entiers dans
@@ -27,8 +27,18 @@ Permuteur::Permuteur(int max)
   {
     i_perm=i_perm <max ?i_perm++ : indices[0];
     return perm[i_perm];
-
   }
+
+/**
+ * suivant aleatoire 
+ * 
+ * @return int 
+ */
+int Permuteur::suivantAlea()
+{
+  i_perm = rand() % max; 
+  return perm[i_perm];
+}
 
   Permuteur::~Permuteur()
   {

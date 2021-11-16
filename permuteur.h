@@ -39,6 +39,12 @@ public:
    * Retourne l'entier suivant.
    */
   int suivant();
+  
+  /*!
+  * Suivant aleatoire 
+  */
+
+  int suivantAlea();
 
  private :
   int max;
