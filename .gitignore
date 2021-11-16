@@ -1,5 +1,5 @@
-tp.o
-testpermut.o
+tp
+testpermut
 matrix2d.o
 permuteur.o
 raccordeur_simple.o
