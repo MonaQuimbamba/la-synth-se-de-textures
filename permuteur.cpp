@@ -25,12 +25,7 @@ Permuteur::Permuteur(int max)
 **/
   int Permuteur::suivant()
   {
-    if(i_perm <max){
-      i_perm++;
-    }
-    else{
-      i_perm=indices[0];
-    }
+    i_perm=i_perm <max ?i_perm++ : indices[0];
     return perm[i_perm];
 
   }
