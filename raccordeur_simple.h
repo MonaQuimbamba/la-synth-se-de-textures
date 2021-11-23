@@ -10,7 +10,8 @@
  * Cette classe est une classe concrete et derive/implemente le concept de
  * Raccordeur (\see{Raccordeur}).
  */
-class RaccordeurSimple : public Raccordeur {
+class RaccordeurSimple : public Raccordeur
+        {
 
   /*!
    * le calcul du raccord (\see{Raccordeur#calculerRaccord}).

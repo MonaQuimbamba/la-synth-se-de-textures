@@ -27,7 +27,8 @@ int RaccordeurSimple::calculerRaccord(MatInt2* distances, int* coupe)
   }
 
   return cout;
-  
+
+
 }
 
 RaccordeurSimple::~RaccordeurSimple()

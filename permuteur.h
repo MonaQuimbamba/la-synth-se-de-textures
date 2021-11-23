@@ -18,7 +18,8 @@
  * d'une permutation, puis d'une autre, ...
  *
  */
-class Permuteur {
+class Permuteur
+        {
 // A FAIRE : classe a completer au besoin
 // A FAIRE : les implementations dans permuteur.cpp
 
@@ -40,13 +41,8 @@ public:
    */
   int suivant();
   
-  /*!
-  * Suivant aleatoire 
-  */
 
-  int suivantAlea();
-
- private :
+  private :
   int max;
   int* perm; // tableau de la permutation.
   int* indices; // tableau des indices � permuter

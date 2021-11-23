@@ -10,7 +10,8 @@
  * Cette classe est plutot une "struct", elle ne contient aucune methodes et
  * tous ses attributs sont "public" et donc accessible par tout le monde.
  */
-class DescripteurTache {
+class DescripteurTache
+        {
 public:
   /*!
    * Fichier image d'entree du textureur.

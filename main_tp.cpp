@@ -9,7 +9,8 @@
 
 
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
 
     srand((unsigned)time(NULL)); // Pour que le random() soit different d'une execution sur l'autre
     int algo; // Version de l'algorithme
@@ -26,7 +27,8 @@ int main(int argc, char **argv){
     tache.largeurSortie = 600;
     tache.hauteurSortie = 600;
 
-    if (!strcmp(argv[argc-1], "--help")) {
+    if (!strcmp(argv[argc-1], "--help"))
+    {
         fprintf(stderr, "Accepte jusqu'a 6 parametres :\n");
         fprintf(stderr, " fichier image, defaut : %s\n", tache.fichierImage);
         fprintf(stderr, " numero de l'algorithme, defaut : %d\n", algo);
@@ -55,7 +57,8 @@ int main(int argc, char **argv){
 
     tache.choisirMeilleurBloc = true;
     tache.utiliserPermuteur = false;
-    switch(algo){
+    switch(algo)
+    {
         case 0:
             // sauf si le parametre de recouvrement a ete specifie, le mettre a 1
             if (argc<5) tache.recouvrement = 1;

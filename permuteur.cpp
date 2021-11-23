@@ -29,16 +29,6 @@ Permuteur::Permuteur(int max)
     return perm[i_perm];
   }
 
-/**
- * suivant aleatoire 
- * 
- * @return int 
- */
-int Permuteur::suivantAlea()
-{
-  i_perm = rand() % max -1 ; 
-  return perm[i_perm];
-}
 
   Permuteur::~Permuteur()
   {
