@@ -299,7 +299,8 @@ void Textureur::ajuster_coupe_GD(int c, int l, int* coupe){
   }
 }
 
-int Textureur::Coupe_HB(Raccordeur* raccordeur, bloc* b1, bloc* b2, int* coupe){
+int Textureur::Coupe_HB(Raccordeur* raccordeur, bloc* b1, bloc* b2, int* coupe)
+{
 
 
     int col1 = b1->x0;
@@ -320,36 +321,36 @@ int Textureur::Coupe_HB(Raccordeur* raccordeur, bloc* b1, bloc* b2, int* coupe){
 void Textureur::ajuster_coupe_HB(int c, int l, int* coupe)
 {
 
-                //fprintf(stdout,"ajuster_coupe_HB avec (c=%d,l=%d)\n",c,l);
-                int nb1 = res_bindex->get(c,l-1);
-                int nb2 = res_bindex->get(c,l);
+    //fprintf(stdout,"ajuster_coupe_HB avec (c=%d,l=%d)\n",c,l);
+    int nb1 = res_bindex->get(c,l-1);
+    int nb2 = res_bindex->get(c,l);
 
-                bloc* b1 = & table_blocs[nb1];
-                int lig1 = b1->y0 + bloc_h - TRecouv2;
-                bloc* b2 = & table_blocs[nb2];
+    bloc* b1 = & table_blocs[nb1];
+    int lig1 = b1->y0 + bloc_h - TRecouv2;
+    bloc* b2 = & table_blocs[nb2];
 
-                int lig_g = l*bloc_uh - TRecouv2;   // col G de la zone de recouvrement dans b1
-                int lig_m = l*bloc_uh;            // col milieu de la zone de recouvrement
-                int dest_x = c*bloc_uw;           // cf. placer_avec_bord
-                int i;
+    int lig_g = l*bloc_uh - TRecouv2;   // col G de la zone de recouvrement dans b1
+    int lig_m = l*bloc_uh;            // col milieu de la zone de recouvrement
+    int dest_x = c*bloc_uw;           // cf. placer_avec_bord
+    int i;
 
-                for(i = TRecouv2; i < bloc_w - TRecouv2; i++)
-                {
-                    if(coupe[i] < TRecouv2)
-                    // on recopie un bout de b2
-                    win2win(*im_texture,
-                        b2->x0+i, b2->y0+coupe[i],
-                        1, TRecouv2-coupe[i],
-                        *im_res,
-                        dest_x+i-TRecouv2, lig_g+coupe[i]);
-                    else
-                    // on recopie un bout de b1
-                    win2win(*im_texture,
-                        b1->x0+i,lig1,
-                        1, coupe[i]-TRecouv2,
-                        *im_res,
-                        dest_x+i-TRecouv2, lig_m);
-                }
+    for(i = TRecouv2; i < bloc_w - TRecouv2; i++)
+    {
+        if(coupe[i] < TRecouv2)
+        // on recopie un bout de b2
+        win2win(*im_texture,
+            b2->x0+i, b2->y0+coupe[i],
+            1, TRecouv2-coupe[i],
+            *im_res,
+            dest_x+i-TRecouv2, lig_g+coupe[i]);
+        else
+        // on recopie un bout de b1
+        win2win(*im_texture,
+            b1->x0+i,lig1,
+            1, coupe[i]-TRecouv2,
+            *im_res,
+            dest_x+i-TRecouv2, lig_m);
+    }
 }
 
 int Textureur::randomBlockIndex()

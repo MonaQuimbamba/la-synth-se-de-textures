@@ -1,6 +1,8 @@
 #ifndef _PERMUTEUR_H
 #define	_PERMUTEUR_H
 
+#include <algorithm>
+using  namespace std;
 /*!
  *
  * Les instances de cette classe sont des iterateurs sur des permutations
@@ -41,11 +43,11 @@ public:
    */
   int suivant();
   
-
+  void permuteur();
   private :
   int max;
   int* perm; // tableau de la permutation.
-  int* indices; // tableau des indices � permuter
+  int* indices; // tableau des indices à permuter
   int i_perm;  // indice d'avancement dans la permutation.
 
 };
