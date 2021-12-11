@@ -58,102 +58,109 @@ void Textureur::traiterTache(DescripteurTache* tache)
 
 void Textureur::init(DescripteurTache& tache)
 {
+    /** Initialisation des paramètres dépendants de l'entrée utilisateur */
+        bloc_fac = tache.racineNombreBlocs;
+        TRecouv = tache.recouvrement;
+        TRecouv2 = TRecouv/2;
+        bord = TRecouv2;
+        const char* fichier = tache.fichierImage;
+        utiliserPermuteur = tache.utiliserPermuteur;
+        choisirMeilleurBloc = tache.choisirMeilleurBloc;
+        nb_bloc=bloc_fac*bloc_fac;  // nombre total de blocs
+        if (utiliserPermuteur) permuteur = new Permuteur(nb_bloc);
 
-    bloc_fac = tache.racineNombreBlocs;
-    TRecouv = tache.recouvrement;
-    TRecouv2 = TRecouv/2;
-    bord = TRecouv2;
-    const char* fichier = tache.fichierImage;
-    utiliserPermuteur = tache.utiliserPermuteur;
-    choisirMeilleurBloc = tache.choisirMeilleurBloc;
+    /** Fin de l'initialisation des paramètres dépendants de l'utilisateur. */
 
-  // parametres dependants
-  nb_bloc=bloc_fac*bloc_fac;  // nombre total de blocs
+  /** Création de la texture */
+      im_texture = new Image_4b();
+      bool resu = im_texture->Image_4b::init(fichier);
+      if (!resu) {
+        delete im_texture ;
+        exit(-1) ;
+      }
+    /** Initialisation des paramètres liés à la texture */
+        tex_w=im_texture->GetWidth();
+        tex_h=im_texture->GetHeight();
+        if(tex_w<=0) exit(-1);
+    /** Fin Initialisation des paramètres liés à la texture. */
 
-      if (utiliserPermuteur) permuteur = new Permuteur(nb_bloc);
-
-  // Gestion de l'image de texture
-  im_texture = new Image_4b();
-  bool resu = im_texture->Image_4b::init(fichier);
-  if (!resu) {
-    delete im_texture ;
-    exit(-1) ;
-  }
-  tex_w=im_texture->GetWidth();
-  tex_h=im_texture->GetHeight();
-  fprintf(stderr,"tex_w=%d,tex_h=%d\n",tex_w,tex_h);
-  if(tex_w<=0) exit(-1);
-
-  // Affichage de l'image de texture
-  X11Display* tex_screen = new X11Display(tex_w,tex_h,"Image texture");
-  fprintf(stderr,"point20\n");
-  tex_screen->DisplayImage(im_texture->GetLinePtr(0),tex_w,tex_h);
-  // tex_screen->Flush();  // peut provoquer SEGFAULT -:-()
-  fprintf(stderr,"point21 (on doit voir l'image %s)\n",fichier);
-
-  printf("cliquer dans l'image  pour continuer\n");
-  tex_screen->Click();
-
-  fprintf(stderr,"point22\n");
-
-  // Calcul de la taille des sous-blocs
-  // On divise l'image de texture en bloc_fac dans chaque dimension
-
-  int min_dim=tex_w>tex_h ? tex_h : tex_w;
-  bloc_w=bloc_h=min_dim / bloc_fac;
-  bloc_uw=bloc_w-2*bord;
-  bloc_uh=bloc_h-2*bord;
-
-  fprintf(stderr,"bloc_fac=%d, TRecouv=%d, TRecouv2=%d,res_hori=%d, res_verti=%d, bord=%d\n",
-	  bloc_fac,TRecouv,TRecouv2,res_hori,res_verti,bord);
-
-  fprintf(stdout,"tex_w=%d,tex_h=%d,bloc_w=%d,bloc_h=%d,bloc_uw=%d,bloc_uh=%d\n",
-	  tex_w,tex_h,bloc_w,bloc_h,bloc_uw,bloc_uh);
-
-  if(bloc_w<TRecouv)
-    {
-      fprintf(stderr,"Mauvaise combinaison bloc_w - TRecouv: %d - %d\n",
-	      bloc_w,TRecouv);
-      exit(-1);
-    }
-  // Construction de la "table des blocs"
-  // avec les coordonnees du PSG de chaque bloc
-  table_blocs = new bloc[nb_bloc];   // allocation dynamique en C++
-  int i, j;
-  for(i = 0; i < bloc_fac; i++)           // colonne i
-    for(j = 0; j < bloc_fac; j++)         // ligne j
-    {
-	table_blocs[j + bloc_fac*i].x0 = j*bloc_w;
-	table_blocs[j + bloc_fac*i].y0 = i*bloc_h;
-    }
-
-  // nombres de blocs en sorties
-  res_hori = (tache.largeurSortie) / (bloc_uw);
-  res_verti = (tache.hauteurSortie) / (bloc_uh);
+    /** Présenter l'image à l'utilisateur et attendre son click pour continuer.*/
+    // Affichage de l'image de texture
+        X11Display* tex_screen = new X11Display(tex_w,tex_h,"Image texture");
+        tex_screen->DisplayImage(im_texture->GetLinePtr(0),tex_w,tex_h);
+        printf("cliquer dans l'image  pour continuer\n");
+        tex_screen->Click();
+    /** Fin de l'attente */
+  /** Fin de la création de la texture. */
 
 
-  // Allocation du tableau des blocs resultat
-  res_bindex = new MatInt2(res_hori,res_verti);
-  // et des tableaux de distance
-  tab_Dist_GD = new MatDouble2(TRecouv,bloc_h);
-  tab_Dist_HB = new MatDouble2(bloc_w,TRecouv);
 
-  tab_Chemin_GD = new MatDouble2(TRecouv,bloc_h);
-  tab_Chemin_HB = new MatDouble2(bloc_w,TRecouv);
+  /** Initialisation des paramètres liés aux blocs. */
+        /** Initialisation de la taille totale des blocs et de la taille de la zone utile des blocs */
+          // Calcul de la taille des sous-blocs
+          // On divise l'image de texture en bloc_fac dans chaque dimension
+          int min_dim=tex_w>tex_h ? tex_h : tex_w;
+          bloc_w=bloc_h=min_dim / bloc_fac;
+          bloc_uw=bloc_w-2*bord;
+          bloc_uh=bloc_h-2*bord;
 
-  coupe_opt = new int[bloc_h];   // attention: ou bloc_w!
+          if(bloc_w<TRecouv)
+            {
+              fprintf(stderr,"Mauvaise combinaison bloc_w - TRecouv: %d - %d\n",
+                  bloc_w,TRecouv);
+              exit(-1);
+            }
+            /** Fin de l'initialisation de la taille des blocs */
 
-  // l'image resultat: calcul des dimensions
-  res_w = bloc_uw * res_hori;
-  res_h = bloc_uh * res_verti;
+        /** Initialisation de la table des blocs */
+          // Construction de la "table des blocs"
+          // avec les coordonnees du point supérieur gauche de chaque bloc
+          table_blocs = new bloc[nb_bloc];   // allocation dynamique en C++
+          int i, j;
+          for(i = 0; i < bloc_fac; i++)           // colonne i
+            for(j = 0; j < bloc_fac; j++)         // ligne j
+            {
+                table_blocs[j + bloc_fac*i].x0 = j*bloc_w;
+                table_blocs[j + bloc_fac*i].y0 = i*bloc_h;
+            }
+        /** Fin Initialisation de la table des blocs. */
 
-  fprintf(stdout,"Dimensions image resultat: %d %d\n",res_w,res_h);
+        /** Initialisation des tableaux de distances */
+          tab_Dist_GD = new MatDouble2(TRecouv,bloc_h);
+          tab_Dist_HB = new MatDouble2(bloc_w,TRecouv);
+        /** Fin Initialisation des tableaux de distances */
 
-  // Gestion de l'image resultat
-  im_res = new Image_4b(res_w,res_h);
-  // fenetre d'affichage pour le resultat
-  screen = new X11Display(res_w,res_h,"Image resultat");
+        /** Initialisation des tableaux contenant les poids des chemins que l'on peut parcourir */
+          tab_Chemin_GD = new MatDouble2(TRecouv,bloc_h);
+          tab_Chemin_HB = new MatDouble2(bloc_w,TRecouv);
+        /** Fin Initialisation des tableaux de poids. */
 
+        /** Initialisation du tableau de coupe optimale. */
+          coupe_opt = new int[bloc_h];   // attention: ou bloc_w!
+        /** Fin Initialisation du tableau de coupe optimale. */
+      /** Fin Initialisation des paramètres liés aux blocs */
+
+    /** Initialisation des paramètres liés à l'image résultat */
+        /** Initialisation du nombre de blocs présent sur une ligne, colonne sur l'image finale. */
+        // nombres de blocs en sorties
+        res_hori = (tache.largeurSortie) / (bloc_uw);
+        res_verti = (tache.hauteurSortie) / (bloc_uh);
+        /** Fin Initialisation du nombre de blocs présents dans l'image finale. */
+
+        /** Initialisation du résultat (sous la forme d'une matrice de blocs) */
+        res_bindex = new MatInt2(res_hori,res_verti);
+        /** Fin Initialisation du résultat. */
+
+        /** Initialisation des dimensions de l'image résultat */
+          res_w = bloc_uw * res_hori;
+          res_h = bloc_uh * res_verti;
+        /** Fin Initialisation des dimensions de l'image résultat. */
+
+        // Gestion de l'image resultat
+        im_res = new Image_4b(res_w,res_h);
+        // fenetre d'affichage pour le resultat
+        screen = new X11Display(res_w,res_h,"Image resultat");
+    /** Fin Initialisation des paramètres liés à l'image de résultat. */
 }
 //========================================
 //
@@ -393,7 +400,7 @@ int Textureur::bestBlockIndex(Raccordeur* raccordeur, int vg, int vh)
         switch (voisinage) 
         {
             case 0: {
-                cout= Coupe_HB(raccordeur, &table_blocs[vh], &table_blocs[i], coupehb) +
+                cout =  Coupe_HB(raccordeur, &table_blocs[vh], &table_blocs[i], coupehb) +
                         Coupe_GD(raccordeur, &table_blocs[vg], &table_blocs[i], coupegd);
                 break;
             }
@@ -422,46 +429,51 @@ int Textureur::bestBlockIndex(Raccordeur* raccordeur, int vg, int vh)
 
 void Textureur::doAlgo(Raccordeur* raccordeur)
 {
-    // premier bloc choisi au hasard
     int c, l;
     for (l = 0;l < res_verti; l++)
-    { // indice ligne - progression par bloc
+    {
           for (c = 0; c < res_hori; c++)
-          { // indice colonne
+          {
                   int ind;
-                  if (choisirMeilleurBloc)
-                  {
-                      int vg = c>0 ? res_bindex->get(c-1, l) : -1;
-                      int vh = l>0 ? res_bindex->get(c, l-1) : -1;
+
+                  if (choisirMeilleurBloc) {
+                      int vg = c>0 ? res_bindex->get(c-1, l) : -1; // Indice du voisin gauche
+                      int vh = l>0 ? res_bindex->get(c, l-1) : -1; // Indice du voisin droite
                       ind = bestBlockIndex(raccordeur, vg, vh);
-                  }
-                  else
-                  {
+                  }else {
                       ind = randomBlockIndex();
                   }
-                  // fprintf(stderr, "xr=%d,yr=%d,bloc= %d\n", c, l, ind);
+
                   res_bindex->set(c, l, ind);
                   placer_avec_bord(ind, c, l);
-                  if (c > 0)
-                  {
+
+                  if (c > 0) {
                       int *coupe = new int[bloc_h];
-                      Coupe_GD(raccordeur, &table_blocs[ind], &table_blocs[res_bindex->get(c-1, l)], coupe);
+                      Coupe_GD(raccordeur,
+                               &table_blocs[ind],
+                               &table_blocs[res_bindex->get(c-1, l)],
+                               coupe);
                       ajuster_coupe_GD(c, l, coupe);
                       delete[] coupe;
                   }
-                  if (l > 0)
-                  {
+
+                  if (l > 0) {
                       int *coupe = new int[bloc_w];
-                      Coupe_HB(raccordeur, &table_blocs[ind], &table_blocs[res_bindex->get(c, l-1)], coupe);
+                      Coupe_HB(raccordeur,
+                               &table_blocs[ind],
+                               &table_blocs[res_bindex->get(c, l-1)],
+                               coupe);
                       ajuster_coupe_HB(c, l, coupe);
                       delete[] coupe;
                   }
           }
     }
+
     screen->DisplayImage(im_res->GetLinePtr(0), res_w, res_h);
-    printf("c'est tout - cliquer dans l'image resultat pour finir\n");
+    printf("c'est tout - cliquer sur l'image resultat pour finir\n");
     screen->Click();
+
     screen->DisplayImage(im_res->GetLinePtr(0), res_w, res_h);
-    printf("c'est tout - cliquer dans l'image resultat pour finir\n");
+    printf("c'est tout - cliquer sur l'image resultat pour finir\n");
     screen->Click();
 }

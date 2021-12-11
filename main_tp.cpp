@@ -64,12 +64,14 @@ int main(int argc, char **argv)
             tache.raccordeur = new RaccordeurSimple();
             break;
         case 1:
+            tache.recouvrement = 1;
             tache.choisirMeilleurBloc = false;
             tache.utiliserPermuteur = true;
             tache.raccordeur = new RaccordeurSimple();
             break;
         case 2:
-            //tache.raccordeur = new RaccordeurSimple();
+            tache.choisirMeilleurBloc = true;
+            tache.raccordeur = new RaccordeurSimple();
             break;
         case 3:
             //tache.raccordeur = new RaccordeurRecursifNaif();
