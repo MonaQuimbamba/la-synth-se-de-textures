@@ -5,10 +5,12 @@
  *  l'explosion combinatoire.
  * */
 
-int RaccordeurRecursifNaif::calculerRaccord(MatInt2 *distances, int *coupe){
+int RaccordeurRecursifNaif::calculerRaccord(MatInt2 *distances, int *coupe)
+{
     int poids_minimal = INT_MAX;
 
-    for (int colonne = 0; colonne < distances->nColonnes(); colonne++){
+    for (int colonne = 0; colonne < distances->nColonnes(); colonne++)
+    {
         int *coupe_temporaire = new int[distances->nLignes()]; // Initialisé à zéro cf. Zero Initialisation C++
         int poids = poidsDuChemin(distances, distances->nLignes()-1, colonne, coupe_temporaire);
 
@@ -24,8 +26,10 @@ int RaccordeurRecursifNaif::calculerRaccord(MatInt2 *distances, int *coupe){
     return poids_minimal;
 };
 
-int RaccordeurRecursifNaif::poidsDuChemin(MatInt2 *distances, int ligne, int colonne, int *coupe) {
-    if (ligne == 0) {
+int RaccordeurRecursifNaif::poidsDuChemin(MatInt2 *distances, int ligne, int colonne, int *coupe)
+{
+    if (ligne == 0)
+    {
         coupe[0] = colonne;
         return distances->get(ligne, colonne);
     } else {
@@ -95,12 +99,63 @@ int RaccordeurRecursifNaif::poidsDuChemin(MatInt2 *distances, int ligne, int col
     }
 }
 
-RaccordeurRecursifNaif::~RaccordeurRecursif(){
+RaccordeurRecursifNaif::~RaccordeurRecursifNaif()
+{
     // Rien à détruire
 }
 
 
-/** Partie qui code le raccordeur récursif en supprimant le problème d'explosion combinatoire.
- *
- */
+/** Partie qui code le raccordeur récursif en supprimant le problème d'explosion combinatoire.  **/
+
+
+ int RaccordeurRecursif::calculerRaccord(MatInt2 *distances, int *coupe)
+ {
+     int poids_minimal = INT_MAX;
+
+     for (int colonne = 0; colonne < distances->nColonnes(); colonne++)
+     {
+         int *coupe_temporaire = new int[distances->nLignes()]; // Initialisé à zéro cf. Zero Initialisation C++
+         int poids = poidsDuChemin(distances, colonne, 0, coupe_temporaire);
+         if (poids < poids_minimal)    //(ind_min_double(poids,poids_minimal) < 0) on pourrait verifier si le plus petit poids est inferieur de zero
+         {
+             poids_minimal = poids;
+             for (int i = 0; i < distances->nLignes(); i++)
+                 coupe[i] = coupe_temporaire[i];
+         }
+
+         delete[]coupe_temporaire;
+     }
+
+     return poids_minimal;
+ }
+int RaccordeurRecursif::poidsDuChemin(MatInt2 *distances,int ligne,int colonne,int *coupe)
+{
+    if(colonne>=distances->nLignes() || ligne<0 || ligne>=distances->nColonnes())
+    {return 0;}
+    int poids_cellules_adjacentes1 = distances->get(colonne,ligne-1);
+    int poids_cellules_adjacentes2 = distances->get(colonne,ligne);
+    int poids_cellules_adjacentes3 = distances->get(colonne,ligne+1);
+
+    int indice_valeurs_minimales = ind_min_double(poids_cellules_adjacentes1,poids_cellules_adjacentes2,poids_cellules_adjacentes3);
+    if(indice_valeurs_minimales< 0)
+    {
+        coupe[colonne] = ligne-1;
+        return (poids_cellules_adjacentes1 + poidsDuChemin(distances, ligne-1, colonne+1, coupe));
+    }else if(indice_valeurs_minimales == 0)
+    {
+        coupe[colonne] = ligne;
+        return (poids_cellules_adjacentes2 + poidsDuChemin(distances, ligne, colonne+1, coupe));
+    }
+    else{
+        coupe[colonne] = ligne+1;
+        return (poids_cellules_adjacentes3 + poidsDuChemin(distances, ligne+1, colonne+1, coupe));
+    }
+
+}
+RaccordeurRecursif::~RaccordeurRecursif()
+{
+     // rien à liberer
+ }
+
+
 

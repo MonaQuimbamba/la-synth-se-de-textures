@@ -3,6 +3,7 @@
 
 #include "raccordeur.h"
 #include <bits/stdc++.h>
+#include "tools.h"
 
 using namespace std;
 
@@ -31,11 +32,12 @@ public :
   virtual ~RaccordeurRecursifNaif();
 };
 
+
 class RaccordeurRecursif : public Raccordeur
 {
 public:
 
-    virtual int calculerRaccord(MatInt2 *distance, int *coupe);
+    virtual int calculerRaccord(MatInt2 *distances, int *coupe);
     int poidsDuChemin(MatInt2 *distances,
                       int ligne,
                       int colonne,
