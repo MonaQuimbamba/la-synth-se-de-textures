@@ -1,5 +1,6 @@
-.idea
-.idea/*
+/.idea
+/.idea/*
+/.idea/misc.xml
 Textureur
 TestPermuteur
 CMakeFiles
@@ -8,3 +9,5 @@ cmake_install.cmake
 Makefile
 tp_textures.pdf
 uml.png
+/Textures.cbp
+/cmake-build-debug/
