@@ -1,5 +1,10 @@
 #include "raccordeur_recursif.h"
 
+/** Partie concernant le raccordeur_recursif naïf, il est fait pour le sport, fonctionnel avec comme
+ *  entrée : Textureur gravier.tif 3 11 5 300 300 ; mais met 30 minutes à s'éxécuter à cause de
+ *  l'explosion combinatoire.
+ * */
+
 int RaccordeurRecursifNaif::calculerRaccord(MatInt2 *distances, int *coupe){
     int poids_minimal = INT_MAX;
 
@@ -12,6 +17,8 @@ int RaccordeurRecursifNaif::calculerRaccord(MatInt2 *distances, int *coupe){
             for (int i = 0; i < distances->nLignes(); i++)
                 coupe[i] = coupe_temporaire[i];
         }
+
+        delete[]coupe_temporaire;
     }
 
     return poids_minimal;
@@ -26,6 +33,7 @@ int RaccordeurRecursifNaif::poidsDuChemin(MatInt2 *distances, int ligne, int col
         int **coupes_temporaires = new int*[3];
         for (int i = 0; i < 3; coupes_temporaires[i] = new int[distances->nLignes()],i++);
         int indice_valeurs_minimales; // poids et chemin
+        int poids;
 
         /** Comme dans l'illustration ci-dessous pour la plupart des cases,
          *  on calcule le poids d'une cellule à l'aide des trois cases
@@ -47,16 +55,16 @@ int RaccordeurRecursifNaif::poidsDuChemin(MatInt2 *distances, int ligne, int col
          * */
         if (colonne == 0 ){
             poids_cellules_adjacentes[0] = INT_MAX;
-            poids_cellules_adjacentes[1] = poidsDuChemin(distances,colonne,ligne-1,coupes_temporaires[1]);
-            poids_cellules_adjacentes[2] = poidsDuChemin(distances,colonne+1,ligne-1,coupes_temporaires[2]);
+            poids_cellules_adjacentes[1] = poidsDuChemin(distances,ligne-1, colonne,coupes_temporaires[1]);
+            poids_cellules_adjacentes[2] = poidsDuChemin(distances,ligne-1, colonne+1,coupes_temporaires[2]);
         } else if ( colonne == distances->nColonnes()-1 ){
-            poids_cellules_adjacentes[0] = poidsDuChemin(distances,colonne-1,ligne-1,coupes_temporaires[0]);
-            poids_cellules_adjacentes[1] = poidsDuChemin(distances,colonne,ligne-1, coupes_temporaires[1]);
+            poids_cellules_adjacentes[0] = poidsDuChemin(distances,ligne-1,colonne-1,coupes_temporaires[0]);
+            poids_cellules_adjacentes[1] = poidsDuChemin(distances,ligne-1, colonne, coupes_temporaires[1]);
             poids_cellules_adjacentes[2] = INT_MAX;
         }  else {
-            poids_cellules_adjacentes[0] = poidsDuChemin(distances,colonne-1,ligne-1,coupes_temporaires[0]);
-            poids_cellules_adjacentes[1] = poidsDuChemin(distances, colonne, ligne-1, coupes_temporaires[1]);
-            poids_cellules_adjacentes[2] = poidsDuChemin(distances, colonne+1,ligne-1, coupes_temporaires[2]);
+            poids_cellules_adjacentes[0] = poidsDuChemin(distances,ligne-1,colonne-1,coupes_temporaires[0]);
+            poids_cellules_adjacentes[1] = poidsDuChemin(distances, ligne-1, colonne, coupes_temporaires[1]);
+            poids_cellules_adjacentes[2] = poidsDuChemin(distances,ligne-1, colonne+1, coupes_temporaires[2]);
         }
 
         /** Il y a une correspondance entre l'indice du tableau contenant les poids des cellules
@@ -71,11 +79,28 @@ int RaccordeurRecursifNaif::poidsDuChemin(MatInt2 *distances, int ligne, int col
          *
          *  On retourne finalement pour résultat le poids de la récursion présente.
          *  */
-        indice_valeurs_minimales = poids_cellules_adjacentes - min_element(poids_cellules_adjacentes, poids_cellules_adjacentes+3);
+        indice_valeurs_minimales = (int)(min_element(poids_cellules_adjacentes, poids_cellules_adjacentes+3) - poids_cellules_adjacentes);
+
         for (int i =0; i < ligne; i++){
             coupe[i] = coupes_temporaires[indice_valeurs_minimales][i];
         }
         coupe[ligne] = colonne;
-        return poids_cellules_adjacentes[indice_valeurs_minimales];
+        poids = poids_cellules_adjacentes[indice_valeurs_minimales] + distances->get(ligne,colonne);
+
+        delete []poids_cellules_adjacentes;
+        for (int i = 0; i < 3; i++)
+            delete[]coupes_temporaires[i];
+        delete[]coupes_temporaires;
+        return poids;
     }
 }
+
+RaccordeurRecursifNaif::~RaccordeurRecursif(){
+    // Rien à détruire
+}
+
+
+/** Partie qui code le raccordeur récursif en supprimant le problème d'explosion combinatoire.
+ *
+ */
+

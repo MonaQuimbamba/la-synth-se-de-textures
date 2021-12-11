@@ -4,6 +4,7 @@
 #include "descripteur_tache.h"
 #include "raccordeur.h"
 #include "raccordeur_simple.h"
+#include "raccordeur_recursif.h"
 
 
 
@@ -70,14 +71,13 @@ int main(int argc, char **argv)
             tache.raccordeur = new RaccordeurSimple();
             break;
         case 2:
-            tache.choisirMeilleurBloc = true;
             tache.raccordeur = new RaccordeurSimple();
             break;
         case 3:
-            //tache.raccordeur = new RaccordeurRecursifNaif();
+            tache.raccordeur = new RaccordeurRecursifNaif();
             break;
         case 4:
-
+            tache.raccordeur = new RaccordeurRecursif();
             break;
         case 5:
 
