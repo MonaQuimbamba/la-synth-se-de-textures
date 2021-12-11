@@ -5,6 +5,7 @@
 #include "raccordeur.h"
 #include "raccordeur_simple.h"
 #include "raccordeur_recursif.h"
+#include "raccordeur_iteratif.h"
 
 
 
@@ -80,7 +81,7 @@ int main(int argc, char **argv)
             tache.raccordeur = new RaccordeurRecursif();
             break;
         case 5:
-
+            tache.raccordeur = new RaccordeurIteratif();
             break;
         default:
             fprintf(stderr, "Valeur non geree pour algo : %d\n", algo);
