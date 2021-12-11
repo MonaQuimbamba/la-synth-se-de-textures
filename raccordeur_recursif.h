@@ -13,18 +13,15 @@ ei,j + min(Ei−1,j−1,Ei−1,j ,Ei-1,j+1
  * Cette classe est une classe concrete et derive/implemente le concept de
  * Raccordeur (\see{Raccordeur}).
  */
-class raccordeurRecursif : public RaccordeurRecursif
+class RaccordeurRecursif
 {
-
+public :
   /*!
    * le calcul du raccord (\see{raccordeurRecursif#calculerRaccordRecursif}).
    * Le code effectif se trouve dans raccordeur_recursif.cpp
    */
   virtual int calculerRaccord(MatInt2* distances, int* coupe);
-   virtual void recursif(MatInt2* distances, int lig , int col );
-
-  virtual ~raccordeurRecursif(); // destructeur
-
+  virtual void recursif(MatInt2* distances, int lig , int col );
 };
 
 #endif

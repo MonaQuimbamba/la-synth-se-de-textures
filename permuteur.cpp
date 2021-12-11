@@ -1,8 +1,6 @@
 #include "permuteur.h"
-#include <vector>
-#include <iostream>
 #include <cstdlib>
-#include <stdlib.h> 
+#include <ctime>
 
 /*!
  * Construit un nouveau permuteur qui retournera des nombres entiers dans
@@ -10,72 +8,59 @@
  */
 Permuteur::Permuteur(int max)
 {
-  this->max=max;
-  this->perm = (int*)malloc(this->max*sizeof(int)); // allouer le tableau de permutation
-  this->indices = (int*)malloc(this->max*sizeof(int)); // alouer le tableu des indices
-  for(int i=0 ; i < this->max ; i++)  // remplir le tableau de permutation
-  {
-    this->perm[i]=i;
-    this->indices[i]=i;
-  }
-    this->i_perm =this->indices[0];
+    this->max=max;
+    this->perm = (int*)malloc(this->max*sizeof(int)); // allouer le tableau de permutation
+    this->indices = (int*)malloc(this->max*sizeof(int)); // alouer le tableu des indices
+    for(int i=0 ; i < this->max ; i++)  // remplir le tableau de permutation
+    {
+        this->perm[i]=i;
+    }
+
+    this->permuter();
 }
+
 /**
-* Retourne l'entier suivant
+*   Générer le prochain indice de bloc à lire.
 **/
   int Permuteur::suivant()
   {
-      if(this->i_perm <this->max )
-      {
-          this->i_perm++;
+      if (this->i_perm == this->max){
+          this->permuter();
       }
-      else{
 
-          this->permuteur();
+      int indice_next = this->indices[this->i_perm];
+      int next = this->perm[indice_next];
 
-          this->i_perm=this->indices[0];
-      }
-    return this->perm[this->i_perm];
+      this->i_perm++;
+      return next;
   }
 
-
-  void Permuteur::permuteur()
+  /**   Générer un ordre dans lequel parcourir notre tableau d'indices de
+   *    blocs.
+   */
+  void Permuteur::permuter()
   {
-      for(int i=0 ; i< this->max ; i++) // on rempli le tableau des indeces avec que de -1
-      { this->indices[i]=-1;}
-
-      int i=0;
-      bool arreter=false;
-      while ( arreter==false && i < this->max) // tant qu'on a pas fini les -1 par les nouveaux indices on boucle
+      // Nettoyer le tableau d'indices
+      for(int i=0 ; i < this->max ; i++)
       {
-
-          bool plusDeM1 = find(this->indices, this->indices+ this->max,-1) != this->indices+ this->max;
-          if(plusDeM1==0){ // si il y'a plus des -1 dans le tableau , on arrete la boucle
-              arreter=true;
-              cout<<" in \n";
-          }
-
-          int val = rand() % this->max;
-          bool existValInIndeces = find(this->indices, this->indices+this->max,val) != this->indices+this->max;
-          if(existValInIndeces==1) // si le val existe déjà dans indices on increment le i++
-          { i++;}
-          else{ // s'il n'existe pas encore on l'ajoute dans le tableu indices , c-à-d on remplace le -1 par un vrai index
-              this->indices[i]=val;
-          }
-
-
+          this->indices[i]=-1;
       }
 
+      // Créer une nouvelle permutation
+      for (int i = 0; i < this->max; i++){
+          int value = rand()%this->max;
+          while (count(this->indices, this->indices+this->max, value) > 0)
+              value = rand()%this->max;
 
+          this->indices[i] = value;
+      }
 
+      // Mise à jour de l'indice à lire au début du nouveau tableau généré.
+      this->i_perm=0;
   }
 
   Permuteur::~Permuteur()
   {
-
     free(this->perm);
     free(this->indices);
-    /*!
-     * Libere les ressources utilisees par ce permuteur.
-     */
   }

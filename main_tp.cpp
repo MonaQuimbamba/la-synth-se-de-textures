@@ -1,7 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <tiff.h>
 #include "textureur.h"
 #include "descripteur_tache.h"
 #include "raccordeur.h"
@@ -71,7 +69,7 @@ int main(int argc, char **argv)
             tache.raccordeur = new RaccordeurSimple();
             break;
         case 2:
-            tache.raccordeur = new RaccordeurSimple();
+            //tache.raccordeur = new RaccordeurSimple();
             break;
         case 3:
             //tache.raccordeur = new RaccordeurRecursifNaif();

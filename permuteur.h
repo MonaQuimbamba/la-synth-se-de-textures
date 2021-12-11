@@ -43,12 +43,13 @@ public:
    */
   int suivant();
   
-  void permuteur();
+  void permuter();
+    int max;
+    int* perm;
+    int* indices; // tableau des indices à permuter
+    int i_perm;  // indice d'avancement dans la permutation.
   private :
-  int max;
-  int* perm; // tableau de la permutation.
-  int* indices; // tableau des indices à permuter
-  int i_perm;  // indice d'avancement dans la permutation.
+
 
 };
 
