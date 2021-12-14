@@ -3,5 +3,5 @@
 
 # Installer 
  - sudo apt-get install libfftw3-dev libtiff5-dev
-# Pour éxecuter
+# Pour Compiler
 CMake . ; make
