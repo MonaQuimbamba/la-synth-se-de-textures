@@ -107,139 +107,152 @@ RaccordeurRecursifNaif::~RaccordeurRecursifNaif()
 
 /** Partie qui code le raccordeur récursif en supprimant le problème d'explosion combinatoire.  **/
 
-/** On modifie légèrement notre fonction de calcul de raccord par créer notre matrice M
- *  (on suit les notations indiquées dans notre rapport) qui contient les poids des cellules.
- *  Pour rappel nous appelons poids des cellules, les E_{i,j} donnés en appliquant la formule de récurence
- *  sur les différences de couleur des pixels notés e_{i,j}. C'est cette matrice M qui va nous permettre
- *  de stocker les poids lorsqu'ils ne sont pas encore calculés et de les retrouver lorsqu'ils ont
- *  déjà été calculé.
- *
- *  */
-
  int RaccordeurRecursif::calculerRaccord(MatInt2 *distances, int *coupe)
  {
-     int poids_minimal = INT_MAX;
-     /** Initialisation de la Matrice M */
-     this->M = MatInt2(distances->nLignes(), distances->nColonnes());
-     for(int i = 0; i < M.nLignes(); i++)
-         for(int j = 0; j < M.nColonnes(); j++)
-             this->M.set(i,j,-1); // -1 représente l'état non-calculé du poids d'une cellule.
-    /** Fin Initialisation */
-/*
-    for (int i =0; i < distances->nLignes();i++){
-        printf("coupe[%d] = %d\t", i , coupe[i]);
-    }
-*/
-     int colonne_poids_min = 0;
+     int poids_minimal = 0;
 
-     for (int colonne = 0; colonne < distances->nColonnes(); colonne++)
-     {
+     MatInt2 poids = MatInt2(distances->nLignes(), distances->nColonnes());
+     for (int ligne = 0; ligne < poids.nLignes(); ligne++) {
+         for (int colonne = 0; colonne < poids.nColonnes(); colonne++)
+             poids.set(ligne, colonne, -1);
+     }
 
-         int poids = poidsDuChemin(distances, distances->nLignes()-1, colonne);
-         this->M.set(distances->nLignes()-1,colonne, poids);
-         if (poids < this->M.get(distances->nLignes()-1,colonne_poids_min)){
-             colonne_poids_min = colonne;
+    /** Calcul de la matrice de poids.*/
+
+     int colonne_poids_minimal = 0;
+     int colonne_courante = 0;
+     int ligne_courante = distances->nLignes()-1;
+     for (; colonne_courante < distances->nColonnes(); colonne_courante++){
+         this->calculPoids(distances,&poids,ligne_courante,colonne_courante);
+
+         if (poids.get(ligne_courante, colonne_courante) < poids.get(ligne_courante, colonne_poids_minimal)){
+             colonne_poids_minimal = colonne_courante;
          }
      }
 
-     int ligne_courante = distances->nLignes()-1;
-     do {
-        coupe[ligne_courante] = colonne_poids_min;
+     poids_minimal = poids.get(distances->nLignes()-1, colonne_poids_minimal);
 
-        if (colonne_poids_min == 0){
-            if (this->M.get(ligne_courante-1, colonne_poids_min) < this->M.get(ligne_courante-1, colonne_poids_min+1)){
-                colonne_poids_min = colonne_poids_min;
-            } else {
-                colonne_poids_min = colonne_poids_min+1;
-            }
-        } else if (colonne_poids_min == distances->nColonnes()-1){
-            if (this->M.get(ligne_courante-1, colonne_poids_min-1) < this->M.get(ligne_courante-1, colonne_poids_min)){
-                colonne_poids_min = colonne_poids_min-1;
-            } else {
-                colonne_poids_min = colonne_poids_min;
-            }
-        } else {
-            if (this->M.get(ligne_courante-1, colonne_poids_min-1) < this->M.get(ligne_courante-1, colonne_poids_min)){
-                if (this->M.get(ligne_courante-1, colonne_poids_min-1) < this->M.get(ligne_courante-1, colonne_poids_min+1)){
-                    colonne_poids_min = colonne_poids_min-1;
-                }
-            } else if (this->M.get(ligne_courante-1, colonne_poids_min) < this->M.get(ligne_courante-1, colonne_poids_min+1)) {
-                colonne_poids_min = colonne_poids_min;
-            } else {
-                colonne_poids_min = colonne_poids_min+1;
-            }
-        }
-        ligne_courante--;
+     /** Calcul de la coupe. */
+     /// int *coupe = new int[poids.nLignes()];
+     for (int i = 0; i < poids.nLignes(); coupe[i]=0,i++);
+
+     colonne_courante = colonne_poids_minimal;
+     ligne_courante = poids.nLignes()-1;
+     do {
+         coupe[ligne_courante] = colonne_courante;
+
+         colonne_courante = colonneDuPoidsMinimalDesCasesAdjacentes(&poids, ligne_courante, colonne_courante);
+         ligne_courante--;
      } while (ligne_courante > 0);
-        coupe[ligne_courante] = colonne_poids_min;
-    return poids_minimal;
+     coupe[0] = colonne_courante;
+
+     return poids_minimal;
+ }
+
+ int RaccordeurRecursif::colonneDuPoidsMinimalDesCasesAdjacentes(MatInt2 *poids, int ligne, int colonne) {
+     int colonne_minimum = 0;
+     int poids_adjacent_0 = INT_MAX;
+     int poids_adjacent_1 = INT_MAX;
+     int poids_adjacent_2 = INT_MAX;
+
+     if (colonne == 0){
+         poids_adjacent_1 = poids->get(ligne-1,colonne);
+         poids_adjacent_2 = poids->get(ligne-1, colonne+1);
+     } else if (colonne == poids->nColonnes()-1){
+         poids_adjacent_0 = poids->get(ligne-1,colonne-1);
+         poids_adjacent_1 = poids->get(ligne-1,colonne);
+     } else {
+         poids_adjacent_0 = poids->get(ligne-1,colonne-1);
+         poids_adjacent_1 = poids->get(ligne-1,colonne);
+         poids_adjacent_2 = poids->get(ligne-1, colonne+1);
+     }
+
+
+     if (poids_adjacent_0 < poids_adjacent_1){
+         if (poids_adjacent_0 < poids_adjacent_2) {
+             colonne_minimum = colonne-1;
+         } else {
+             colonne_minimum = colonne+1;
+         }
+     } else if (poids_adjacent_1 < poids_adjacent_2){
+         colonne_minimum = colonne;
+     } else {
+         colonne_minimum = colonne+1;
+     }
+
+     return colonne_minimum;
  }
 
  /**    On reprends simplement le code naïf de notre raccordeur récursif, cependant, on utilise M afin
   *     de vérifier si l'on a déjà calculé un chemin, auquel cas on récupère le poids dans M sinon
   *     on le calcule et on le place dans M.*/
-int RaccordeurRecursif::poidsDuChemin(MatInt2 *distances,int ligne,int colonne)
+void RaccordeurRecursif::calculPoids(MatInt2 *distances,MatInt2 *poids,int ligne_courante,int colonne_courante)
 {
-    if (ligne == 0)
-    {
-        this->M.set(ligne,colonne, distances->get(ligne,colonne)); /// Ajout du poids dans M
-        return distances->get(ligne, colonne);
+    if (ligne_courante == 0){
+        poids->set(ligne_courante, colonne_courante, distances->get(ligne_courante,colonne_courante));
     } else {
-        int poids_cellule_adjacente_0, poids_cellule_adjacente_1, poids_cellule_adjacente_2;
-        int indice_valeurs_minimales; // poids et chemin
-        int poids;
+        int poids_minimal = -1;
+        int poids_adjacent_0 = INT_MAX;
+        int poids_adjacent_1 = INT_MAX;
+        int poids_adjacent_2 = INT_MAX;
 
-        /** On modifie cet appel récusif pour prendre en compte le calcul éffectué possiblement
-         *  précédemment. On utilise une condition ternaire pour éviter les if() {} qui ralongerait
-         *  beaucoup trop notre code au risque de réduire la lisibilité du code.
-         *  On précise donc la forme de ces conditions ternaires :
-         *      Cellule non calculée ?
-         *          effectuer la récursion
-         *      :   récupérer le résultat dans M
-         *  */
-        if (colonne == 0 ){
-            poids_cellule_adjacente_0 = INT_MAX;
-            poids_cellule_adjacente_1 = this->M.get(ligne-1,colonne) == -1 ?
-                        poidsDuChemin(distances,ligne-1, colonne)
-                    :   this->M.get(ligne-1, colonne);
-            poids_cellule_adjacente_2 = this->M.get(ligne-1,colonne+1) == -1 ?
-                        poidsDuChemin(distances,ligne-1, colonne+1)
-                    :   this->M.get(ligne-1, colonne+1);
-        } else if ( colonne == distances->nColonnes()-1 ){
-            poids_cellule_adjacente_0 = this->M.get(ligne-1, colonne-1) == -1 ?
-                        poidsDuChemin(distances,ligne-1,colonne-1)
-                    :   this->M.get(ligne-1, colonne-1);
-            poids_cellule_adjacente_1 = this->M.get(ligne-1, colonne) == -1 ?
-                    poidsDuChemin(distances,ligne-1, colonne)
-                    :   this->M.get(ligne-1, colonne);
-            poids_cellule_adjacente_2 = INT_MAX;
-        }  else {
-            poids_cellule_adjacente_0 = this->M.get(ligne-1, colonne-1) == -1 ?
-                        poidsDuChemin(distances,ligne-1,colonne-1)
-                    :   this->M.get(ligne-1, colonne-1);
-            poids_cellule_adjacente_1 = this->M.get(ligne-1, colonne) == -1 ?
-                        poidsDuChemin(distances, ligne-1, colonne)
-                    :   this->M.get(ligne-1, colonne);
-            poids_cellule_adjacente_2 = this->M.get(ligne-1, colonne+1) == -1 ?
-                    poidsDuChemin(distances,ligne-1, colonne+1)
-                    :   this->M.get(ligne-1, colonne+1);
-        }
+        if (colonne_courante == 0){
+            poids_adjacent_0 = INT_MAX;
 
-        if (poids_cellule_adjacente_0 < poids_cellule_adjacente_1) {
-            if (poids_cellule_adjacente_0 < poids_cellule_adjacente_2) {
-                poids = poids_cellule_adjacente_0;
+            if (poids->get(ligne_courante-1,colonne_courante) == -1) {
+                calculPoids(distances, poids, ligne_courante-1, colonne_courante);
             }
-        } else if (poids_cellule_adjacente_1 < poids_cellule_adjacente_2) {
-            poids = poids_cellule_adjacente_1;
+            poids_adjacent_1 = poids->get(ligne_courante-1,colonne_courante);
+
+            if(poids->get(ligne_courante-1,colonne_courante+1) == -1) {
+                calculPoids(distances, poids, ligne_courante-1, colonne_courante+1);
+            }
+            poids_adjacent_2 = poids->get(ligne_courante-1, colonne_courante+1);
+        } else if (colonne_courante == distances->nColonnes()-1){
+            if (poids->get(ligne_courante-1,colonne_courante-1) == -1){
+                calculPoids(distances, poids, ligne_courante-1, colonne_courante-1);
+            }
+            poids_adjacent_0 = poids->get(ligne_courante-1,colonne_courante-1);
+
+            if (poids->get(ligne_courante-1,colonne_courante) == -1) {
+                calculPoids(distances, poids, ligne_courante-1, colonne_courante);
+            }
+            poids_adjacent_1 = poids->get(ligne_courante-1,colonne_courante);
+
+            poids_adjacent_2 = INT_MAX;
         } else {
-            poids = poids_cellule_adjacente_2;
+            if (poids->get(ligne_courante-1,colonne_courante-1) == -1){
+                calculPoids(distances, poids, ligne_courante-1, colonne_courante-1);
+            }
+            poids_adjacent_0 = poids->get(ligne_courante-1,colonne_courante-1);
+
+            if (poids->get(ligne_courante-1,colonne_courante) == -1) {
+                calculPoids(distances, poids, ligne_courante-1, colonne_courante);
+            }
+            poids_adjacent_1 = poids->get(ligne_courante-1,colonne_courante);
+
+            if(poids->get(ligne_courante-1,colonne_courante+1) == -1) {
+                calculPoids(distances, poids, ligne_courante-1, colonne_courante+1);
+            }
+            poids_adjacent_2 = poids->get(ligne_courante-1, colonne_courante+1);
         }
 
-        this->M.set(ligne,colonne, poids); /// On ajoute le poids de la cellule dans M.
+        if (poids_adjacent_0 < poids_adjacent_1){
+            if (poids_adjacent_0 < poids_adjacent_2) {
+                poids_minimal = poids_adjacent_0;
+            } else {
+                poids_minimal = poids_adjacent_2;
+            }
+        } else if (poids_adjacent_1 < poids_adjacent_2){
+            poids_minimal = poids_adjacent_1;
+        } else {
+            poids_minimal = poids_adjacent_2;
+        }
 
-        return poids;
+        poids->set(ligne_courante, colonne_courante, distances->get(ligne_courante,colonne_courante) + poids_minimal);
     }
 }
+
 RaccordeurRecursif::~RaccordeurRecursif()
 {
 }

@@ -28,7 +28,7 @@ add_executable(Textureur
         permuteur.cpp
         textureur.cpp
         x11display_code.cpp
-        main_tp.cpp)
+        main_tp.cpp CoupeOptimale.cpp CoupeOptimale.h)
 
 add_executable(TestPermuteur
         permuteur.cpp

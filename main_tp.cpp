@@ -5,7 +5,7 @@
 #include "raccordeur.h"
 #include "raccordeur_simple.h"
 #include "raccordeur_recursif.h"
-
+#include "CoupeOptimale.h"
 
 
 int main(int argc, char **argv)
@@ -81,9 +81,15 @@ int main(int argc, char **argv)
             break;
         case 5:
             break;
-        default:
+        case 6:
+            CoupeOptimale *co = new CoupeOptimale();
+            co->calculerRaccord();
+            break;
+        /*
+            default:
             fprintf(stderr, "Valeur non geree pour algo : %d\n", algo);
             exit(-2);
+        */
     }
     textureur.traiterTache(&tache);
     return 0;
