@@ -86,7 +86,9 @@ int main(int argc, char **argv)
             break;
         case 6:
             CoupeOptimale *co = new CoupeOptimale();
+            CoupeOptimaleIteratif *coi = new CoupeOptimaleIteratif();
             co->calculerRaccord();
+            coi->calculerRaccord();
             break;
             /*
             default:

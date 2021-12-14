@@ -26,6 +26,7 @@ public :
      */
     virtual int calculerRaccord(MatInt2* distances, int* coupe);
     virtual ~RaccordeurIteratif();
+    int colonneDuPoidsMinimalDesCasesAdjacentes(MatInt2 *poids, int ligne, int colonne);
 };
 
 

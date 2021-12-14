@@ -28,5 +28,16 @@ public:
 
 };
 
+class CoupeOptimaleIteratif {
+private:
+    MatInt2 exampleDistance = MatInt2(5,4);
+    struct cellule { int poids; int cellule;};
+public:
+    CoupeOptimaleIteratif();
+    int colonneDuPoidsMinimalDesCasesAdjacentes(MatInt2 *poids, int ligne, int colonne);
+    void calculerRaccord();
+    ~CoupeOptimaleIteratif();
+    void printMatrice(MatInt2 *matrice);
+};
 
 #endif //TEXTURES_COUPEOPTIMALE_H

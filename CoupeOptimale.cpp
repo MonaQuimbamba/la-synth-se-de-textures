@@ -117,15 +117,6 @@ int CoupeOptimale::colonneDuPoidsMinimalDesCasesAdjacentes(MatInt2 *poids, int l
         colonne_minimum = colonne+1;
     }
 
-    printf("Choix entre poids[%d][%d]  et poids[%d][%d]  et poids[%d][%d] , minimum dans : %d\n",
-           ligne-1,
-           colonne-1,
-           ligne-1,
-           colonne,
-           ligne-1,
-           colonne+1,
-           colonne_minimum);
-
     return colonne_minimum;
 }
 /** Une méthode d'aide à l'affichage. */
@@ -207,3 +198,148 @@ void CoupeOptimale::calculPoids(MatInt2 *distances, MatInt2 *poids, int ligne_co
     }
 }
 
+/** Code du test unitaire pour l'algorithme iteratif */
+
+CoupeOptimaleIteratif::CoupeOptimaleIteratif() {
+    // Création de la matrice de l'exemple du professeur
+    this->exampleDistance.set(0,0,1);
+    this->exampleDistance.set(0,1,3);
+    this->exampleDistance.set(0,2,2);
+    this->exampleDistance.set(0,3,1);
+
+    this->exampleDistance.set(1,0,2);
+    this->exampleDistance.set(1,1,1);
+    this->exampleDistance.set(1,2,2);
+    this->exampleDistance.set(1,3,3);
+
+    this->exampleDistance.set(2,0,1);
+    this->exampleDistance.set(2,1,3);
+    this->exampleDistance.set(2,2,4);
+    this->exampleDistance.set(2,3,2);
+
+    this->exampleDistance.set(3,0,2);
+    this->exampleDistance.set(3,1,4);
+    this->exampleDistance.set(3,2,3);
+    this->exampleDistance.set(3,3,1);
+
+    this->exampleDistance.set(4,0,4);
+    this->exampleDistance.set(4,1,3);
+    this->exampleDistance.set(4,2,1);
+    this->exampleDistance.set(4,3,2);
+}
+
+void CoupeOptimaleIteratif::calculerRaccord() {
+    cout << "Test de la coupe optimale façon itérative." << endl << endl;
+    this->printMatrice(&this->exampleDistance);
+    MatInt2 poids = MatInt2(this->exampleDistance.nLignes(), this->exampleDistance.nColonnes());
+    for (int colonne = 0; colonne < this->exampleDistance.nColonnes(); colonne++){
+        poids.set(0,colonne,this->exampleDistance.get(0,colonne));
+    }
+
+    for (int ligne = 1; ligne < this->exampleDistance.nLignes(); ligne++){
+        for (int colonne = 0; colonne < this->exampleDistance.nColonnes(); colonne++){
+            int poids_adjacent_0 = colonne > 0 ? this->exampleDistance.get(ligne,colonne) + poids.get(ligne-1,colonne-1) : INT_MAX;
+            int poids_adjacent_1 = this->exampleDistance.get(ligne, colonne) + poids.get(ligne-1,colonne);
+            int poids_adjacent_2 = colonne < this->exampleDistance.nColonnes()-1 ? this->exampleDistance.get(ligne,colonne) + poids.get(ligne-1,colonne+1) : INT_MAX;
+
+            if (poids_adjacent_0 < poids_adjacent_1){
+                if (poids_adjacent_0 < poids_adjacent_2) {
+                    poids.set(ligne, colonne, poids_adjacent_0);
+                } else {
+                    poids.set(ligne, colonne, poids_adjacent_2);
+                }
+            } else if (poids_adjacent_1 < poids_adjacent_2){
+                poids.set(ligne, colonne, poids_adjacent_1);
+            } else {
+                poids.set(ligne, colonne, poids_adjacent_2);
+            }
+        }
+    }
+
+    cout << "Matrice des poids calculée. Affichage : " << endl << endl;
+    this->printMatrice(&poids);
+
+    cout << "Calcul de la coupe..." << endl;
+    int *coupe = new int[poids.nLignes()];
+    for (int i = 0; i < poids.nLignes(); coupe[i]=0,i++);
+
+    int colonne_courante = -1;
+    int poids_courant = INT_MAX;
+    for (int colonne = 0; colonne < poids.nColonnes(); colonne++){
+        if (poids.get(poids.nLignes()-1, colonne) < poids_courant) {
+            colonne_courante = colonne; // Pour déterminer le point de départ de la coupe optimale.
+            poids_courant = poids.get(poids.nLignes()-1, colonne);
+        }
+    }
+
+    int ligne_courante = poids.nLignes()-1;
+    do {
+        coupe[ligne_courante] = colonne_courante;
+
+        colonne_courante = colonneDuPoidsMinimalDesCasesAdjacentes(&poids, ligne_courante, colonne_courante);
+        ligne_courante--;
+    } while (ligne_courante > 0);
+    coupe[0] = colonne_courante;
+
+    cout << "Fin du calcul de la coupe. Affichage " << endl << endl << "[";
+    for (int indice = poids.nLignes()-1; indice >=0; indice--){
+        if ( indice != 0)
+            cout << coupe[indice] << ",";
+        else
+            cout << coupe[indice] << "]";
+    }
+
+    cout << endl << endl << "Fin du test." << endl;
+}
+/** Cette fonction renvoie la colonne associé au minimum des cases adjacente à celle renseignée
+ *  en paramètre.*/
+int CoupeOptimaleIteratif::colonneDuPoidsMinimalDesCasesAdjacentes(MatInt2 *poids, int ligne, int colonne) {
+    int colonne_minimum = 0;
+    int poids_adjacent_0 = INT_MAX;
+    int poids_adjacent_1 = INT_MAX;
+    int poids_adjacent_2 = INT_MAX;
+
+    if (colonne == 0){
+        poids_adjacent_1 = poids->get(ligne-1,colonne);
+        poids_adjacent_2 = poids->get(ligne-1, colonne+1);
+    } else if (colonne == poids->nColonnes()-1){
+        poids_adjacent_0 = poids->get(ligne-1,colonne-1);
+        poids_adjacent_1 = poids->get(ligne-1,colonne);
+    } else {
+        poids_adjacent_0 = poids->get(ligne-1,colonne-1);
+        poids_adjacent_1 = poids->get(ligne-1,colonne);
+        poids_adjacent_2 = poids->get(ligne-1, colonne+1);
+    }
+
+
+    if (poids_adjacent_0 < poids_adjacent_1){
+        if (poids_adjacent_0 < poids_adjacent_2) {
+            colonne_minimum = colonne-1;
+        } else {
+            colonne_minimum = colonne+1;
+        }
+    } else if (poids_adjacent_1 < poids_adjacent_2){
+        colonne_minimum = colonne;
+    } else {
+        colonne_minimum = colonne+1;
+    }
+
+    return colonne_minimum;
+}
+
+    /** Une méthode d'aide à l'affichage. */
+
+    void CoupeOptimaleIteratif::printMatrice(MatInt2 *matrice) {
+        cout << "Affichage de la Matrice : " << endl << endl;
+        for (int ligne = 0 ; ligne < matrice->nLignes(); ligne++) {
+            for (int colonne = 0; colonne < matrice->nColonnes(); colonne++){
+                cout << "[" << matrice->get(ligne, colonne) << "]";
+            }
+            cout << endl;
+        }
+        cout << "Fin Affichage de la Matrice." << endl << endl;
+    }
+
+CoupeOptimaleIteratif::~CoupeOptimaleIteratif() {
+
+}
