@@ -3,6 +3,9 @@
 /** Partie concernant le raccordeur_recursif naïf, il est fait pour le sport, fonctionnel avec comme
  *  entrée : Textureur gravier.tif 3 11 5 300 300 ; mais met 30 minutes à s'éxécuter à cause de
  *  l'explosion combinatoire.
+ *
+ *  L'algorithme a été optimisé lors de l'écriture d'une version récursive avec optimisation.
+ *  Il est donc différent de l'algorithme récursif utilisable.
  * */
 
 int RaccordeurRecursifNaif::calculerRaccord(MatInt2 *distances, int *coupe)
@@ -106,7 +109,13 @@ RaccordeurRecursifNaif::~RaccordeurRecursifNaif()
 
 
 /** Partie qui code le raccordeur récursif en supprimant le problème d'explosion combinatoire.  **/
-
+/** Fonction principale de calcul de la coupe et du coût de raccords des blocs.
+ *  Voir CoupeOptimale.cpp pour le même algorithme tournant sur la matrice donnée
+ *  en exemple dans le TP ;
+ *
+ *  Textureur gravier.tif 6 <-- pour avoir un affichage de l'algorithme
+ *  en action sur la matrice donnée en TP.
+ *  */
  int RaccordeurRecursif::calculerRaccord(MatInt2 *distances, int *coupe)
  {
      int poids_minimal = 0;
@@ -149,6 +158,8 @@ RaccordeurRecursifNaif::~RaccordeurRecursifNaif()
      return poids_minimal;
  }
 
+/** Regardes les 3 cases adjacentes (au sens de notre TP) à une colonne et renvoie la colonne où la valeur
+*  est la plus petite. Utilisé pour retrouver la coupe optimale.*/
  int RaccordeurRecursif::colonneDuPoidsMinimalDesCasesAdjacentes(MatInt2 *poids, int ligne, int colonne) {
      int colonne_minimum = 0;
      int poids_adjacent_0 = INT_MAX;
