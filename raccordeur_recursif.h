@@ -35,13 +35,13 @@ public :
 
 class RaccordeurRecursif : public Raccordeur
 {
+private:
+    MatInt2 M = MatInt2(0, 0); /// On initialise par défaut la matrice M pour que le compilateur ne crie pas
 public:
-
     virtual int calculerRaccord(MatInt2 *distances, int *coupe);
     int poidsDuChemin(MatInt2 *distances,
                       int ligne,
-                      int colonne,
-                      int *coupe);
+                      int colonne);
     virtual ~RaccordeurRecursif();
 };
 

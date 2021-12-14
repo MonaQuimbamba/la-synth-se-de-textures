@@ -80,7 +80,6 @@ int main(int argc, char **argv)
             tache.raccordeur = new RaccordeurRecursif();
             break;
         case 5:
-
             break;
         default:
             fprintf(stderr, "Valeur non geree pour algo : %d\n", algo);
